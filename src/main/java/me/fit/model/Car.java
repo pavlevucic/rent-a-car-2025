@@ -1,26 +1,35 @@
 package me.fit.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 
 @Entity
+@NamedQuery(name = "Car.getAllWithRentals", query = "SELECT DISTINCT c FROM Car c LEFT JOIN FETCH c.rentalList")
 public class Car {
 
 	@Id
-	@SequenceGenerator(name="car_sequence",sequenceName="car_sequence")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="car_sequence")
-	Long id;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq")
+	@SequenceGenerator(name = "car_seq", sequenceName = "car_seq", allocationSize = 1)
+	private Long id;
 	String make;
 	String model;
 	int year;
 	String licensePlate;
 	boolean available;
-//	List<Rental> rentals;
+
+	@OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	List<Rental> rentalList = new ArrayList<>();
 //	List<Service> services;
 
 	public Car() {
@@ -35,7 +44,7 @@ public class Car {
 		this.year = year;
 		this.licensePlate = licensePlate;
 		this.available = available;
-//		this.rentals = rentals;
+		this.rentalList = rentalList;
 //		this.services = services;
 	}
 
@@ -87,14 +96,14 @@ public class Car {
 		this.available = available;
 	}
 
-//	public List<Rental> getRentals() {
-//		return rentals;
-//	}
-//
-//	public void setRentals(List<Rental> rentals) {
-//		this.rentals = rentals;
-//	}
-//
+	public List<Rental> getRentalList() {
+		return rentalList;
+	}
+
+	public void setRentalList(List<Rental> rentalList) {
+		this.rentalList = rentalList;
+	}
+
 //	public List<Service> getServices() {
 //		return services;
 //	}
@@ -124,8 +133,8 @@ public class Car {
 
 	@Override
 	public String toString() {
-		return "make=" + make + ", model=" + model + ", year=" + year + ", licensePlate="
-				+ licensePlate + ", available=" + available + "]";
+		return "make=" + make + ", model=" + model + ", year=" + year + ", licensePlate=" + licensePlate
+				+ ", available=" + available + "]";
 	}
 
 }
