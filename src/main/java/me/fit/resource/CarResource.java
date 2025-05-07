@@ -19,6 +19,14 @@ public class CarResource {
 	CarService carService;
 
 	@POST
+	@Path("/with-services")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createCarWithServices(Car car) {
+		carService.createCarWithServices(car);
+		return Response.status(Response.Status.CREATED).build();
+	}
+
+	@POST
 	@Path("/with-rentals")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createCarWithRentals(Car car) {

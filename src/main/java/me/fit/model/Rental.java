@@ -65,6 +65,12 @@ public class Rental {
 		return Objects.equals(id, other.id) && Objects.equals(rentalDate, other.rentalDate);
 	}
 
+	@Override
+	public String toString() {
+		return "Rental [id=" + id + ", rentalDate=" + rentalDate + ", returnDate=" + returnDate + ", car=" + car
+				+ ", customer=" + customer + "]";
+	}
+
 	public Long getId() {
 		return id;
 	}

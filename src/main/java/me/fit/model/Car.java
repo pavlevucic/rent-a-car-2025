@@ -1,22 +1,29 @@
 package me.fit.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
+import me.fit.model.Service;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 
 @Entity
 @NamedQuery(name = "Car.getAllWithRentals", query = "SELECT DISTINCT c FROM Car c LEFT JOIN FETCH c.rentalList")
-public class Car {
+public class Car implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq")
@@ -30,7 +37,10 @@ public class Car {
 
 	@OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	List<Rental> rentalList = new ArrayList<>();
-//	List<Service> services;
+
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name = "car_service", joinColumns = @JoinColumn(name = "car_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
+	Set<Service> services = new HashSet<>();
 
 	public Car() {
 		super();
@@ -44,8 +54,6 @@ public class Car {
 		this.year = year;
 		this.licensePlate = licensePlate;
 		this.available = available;
-		this.rentalList = rentalList;
-//		this.services = services;
 	}
 
 	public Long getId() {
@@ -104,17 +112,17 @@ public class Car {
 		this.rentalList = rentalList;
 	}
 
-//	public List<Service> getServices() {
-//		return services;
-//	}
-//
-//	public void setServices(List<Service> services) {
-//		this.services = services;
-//	}
+	public Set<Service> getServices() {
+		return services;
+	}
+
+	public void setServices(Set<Service> services) {
+		this.services = services;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(available, id, licensePlate, make, model, year);
+		return Objects.hash(available, id, licensePlate, make, model, year, services);
 	}
 
 	@Override
@@ -128,13 +136,12 @@ public class Car {
 		Car other = (Car) obj;
 		return available == other.available && Objects.equals(id, other.id)
 				&& Objects.equals(licensePlate, other.licensePlate) && Objects.equals(make, other.make)
-				&& Objects.equals(model, other.model) && year == other.year;
+				&& Objects.equals(model, other.model) && year == other.year && Objects.equals(services, other.services);
 	}
 
 	@Override
 	public String toString() {
 		return "make=" + make + ", model=" + model + ", year=" + year + ", licensePlate=" + licensePlate
-				+ ", available=" + available + "]";
+				+ ", available=" + available + ", services=" + services + "]";
 	}
-
 }
